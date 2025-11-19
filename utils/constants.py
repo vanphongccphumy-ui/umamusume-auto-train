@@ -1,34 +1,3 @@
-# X, Y, W, H
-MOOD_REGION = (705, 125, 835 - 705, 150 - 125)
-TURN_REGION = (260, 82, 360 - 260, 133 - 82)
-FAILURE_REGION = (295, 790, 800 - 295, 810 - 790)
-YEAR_REGION = (255, 35, 420 - 255, 55 - 35)
-CRITERIA_REGION = (455, 85, 700 - 455, 115 - 85)
-SKILL_PTS_REGION = (760, 780, 825 - 760, 815 - 780)
-EVENT_NAME_REGION = (241, 205, 365, 30)
-
-SPD_STAT_REGION = (310, 723, 52, 20)
-STA_STAT_REGION = (405, 723, 52, 20)
-PWR_STAT_REGION = (500, 723, 52, 20)
-GUTS_STAT_REGION = (595, 723, 52, 20)
-WIT_STAT_REGION = (690, 723, 52, 20)
-
-TRAINING_ICON_COORD = {
-    "spd": (180, 940),
-    "sta": (290, 940),
-    "pwr": (400, 940),
-    "guts": (510, 940),
-    "wit": (620, 940),
-}
-
-# LEFT TOP RIGHT BOTTOM
-FULL_STATS_STATUS_REGION = (265, 575, 680, 940)
-RACE_INFO_TEXT_REGION = (285, 335, 525, 370)
-
-SCROLLING_SELECTION_MOUSE_POS = (560, 680)
-SKILL_SCROLL_BOTTOM_MOUSE_POS = (560, 850)
-RACE_SCROLL_BOTTOM_MOUSE_POS = (560, 860)
-
 MOOD_LIST = ["AWFUL", "BAD", "NORMAL", "GOOD", "GREAT", "UNKNOWN"]
 # Severity -> 0 is doesn't matter / incurable, 1 is "can be ignored for a few turns", 2 is "must be cured immediately"
 BAD_STATUS_EFFECTS = {
@@ -70,64 +39,89 @@ GOOD_STATUS_EFFECTS = {
     "Shining Brightly": "Lowers chance of training failure by 5%",
 }
 
-SUPPORT_CARD_ICON_BBOX = (845, 155, 945, 700)
-ENERGY_BBOX = (440, 120, 800, 160)
-RACE_BUTTON_IN_RACE_BBOX_LANDSCAPE = (800, 950, 1150, 1050)
+SCENARIO_URA = {
+    # X, Y, W, H
+    "MOOD_REGION": (555, 125, 130, 25),
+    "TURN_REGION": (110, 82, 100, 51),
+    "FAILURE_REGION": (145, 790, 505, 20),
+    "YEAR_REGION": (105, 35, 165, 20),
+    "CRITERIA_REGION": (305, 85, 245, 30),
+    "SKILL_PTS_REGION": (610, 780, 65, 35),
+    "EVENT_NAME_REGION": (91, 205, 365, 30),
+    "SPD_STAT_REGION": (160, 723, 52, 20),
+    "STA_STAT_REGION": (255, 723, 52, 20),
+    "PWR_STAT_REGION": (350, 723, 52, 20),
+    "GUTS_STAT_REGION": (445, 723, 52, 20),
+    "WIT_STAT_REGION": (540, 723, 52, 20),
+    "TRAINING_ICON_COORD": {
+        "spd": (180, 940),
+        "sta": (290, 940),
+        "pwr": (400, 940),
+        "guts": (510, 940),
+        "wit": (620, 940),
+    },
+    # LEFT TOP RIGHT BOTTOM
+    "FULL_STATS_STATUS_REGION": (115, 575, 680, 940),
+    "RACE_INFO_TEXT_REGION": (135, 335, 525, 370),
+    "SCROLLING_SELECTION_MOUSE_POS": (410, 680),
+    "SKILL_SCROLL_BOTTOM_MOUSE_POS": (410, 850),
+    "RACE_SCROLL_BOTTOM_MOUSE_POS": (410, 860),
+    "SUPPORT_CARD_ICON_BBOX": (695, 155, 795, 700),
+    "ENERGY_BBOX": (290, 120, 650, 160),
+    "RACE_BUTTON_IN_RACE_BBOX_LANDSCAPE": (650, 950, 1000, 1050),
+}
 
-OFFSET_APPLIED = False
+SCENARIO_UNITY = {
+    # X, Y, W, H
+    "MOOD_REGION": (555, 125, 130, 25),
+    "TURN_REGION": (110, 60, 60, 43),
+    "UNITY_TURN_REGION": (125, 111, 35, 22),
+    "FAILURE_REGION": (145, 790, 505, 20),
+    "YEAR_REGION": (240, 35, 175, 20),
+    "CRITERIA_REGION": (305, 85, 245, 30),
+    "SKILL_PTS_REGION": (610, 780, 65, 35),
+    "EVENT_NAME_REGION": (91, 205, 365, 30),
+    "SPD_STAT_REGION": (160, 723, 52, 20),
+    "STA_STAT_REGION": (255, 723, 52, 20),
+    "PWR_STAT_REGION": (350, 723, 52, 20),
+    "GUTS_STAT_REGION": (445, 723, 52, 20),
+    "WIT_STAT_REGION": (540, 723, 52, 20),
+    "TRAINING_ICON_COORD": {
+        "spd": (180, 940),
+        "sta": (290, 940),
+        "pwr": (400, 940),
+        "guts": (510, 940),
+        "wit": (620, 940),
+    },
+    # LEFT TOP RIGHT BOTTOM
+    "FULL_STATS_STATUS_REGION": (115, 575, 680, 940),
+    "RACE_INFO_TEXT_REGION": (135, 335, 525, 370),
+    "SCROLLING_SELECTION_MOUSE_POS": (410, 680),
+    "SKILL_SCROLL_BOTTOM_MOUSE_POS": (410, 850),
+    "RACE_SCROLL_BOTTOM_MOUSE_POS": (410, 860),
+    "SUPPORT_CARD_ICON_BBOX": (695, 155, 795, 700),
+    "ENERGY_BBOX": (290, 120, 650, 160),
+    "RACE_BUTTON_IN_RACE_BBOX_LANDSCAPE": (650, 950, 1000, 1050),
+}
+
+ACTIVE_SCENARIO = "ura"
 
 
-def adjust_constants_x_coords(offset=150):
-    """Shift all region tuples' x-coordinates by `offset`."""
+class ScenarioConstants:
+    def __getattr__(self, key):
+        if ACTIVE_SCENARIO == "ura":
+            table = SCENARIO_URA
+        elif ACTIVE_SCENARIO == "unity":
+            table = SCENARIO_UNITY
+        else:
+            raise KeyError(f"Unknown scenario: {ACTIVE_SCENARIO}")
 
-    global OFFSET_APPLIED
-    if OFFSET_APPLIED:
-        return
-
-    g = globals()
-
-    for name, value in list(g.items()):
-        if (
-            name.endswith("_REGION")  # only touch REGION constants
-            and isinstance(value, tuple)
-            and len(value) >= 2
-        ):
-            # Adjust only the x-coordinates (0 and 2)
-            new_value = (
-                value[0] - offset,
-                value[1],
-                value[2],
-                value[3],
+        try:
+            return table[key]
+        except KeyError:
+            raise AttributeError(
+                f"No constant named {key} for scenario {ACTIVE_SCENARIO}"
             )
-            # Drop None if length was originally 3
-            g[name] = tuple(x for x in new_value if x is not None)
 
-        if (
-            name.endswith("_MOUSE_POS")  # only touch REGION constants
-            and isinstance(value, tuple)
-            and len(value) >= 2
-        ):
-            # Adjust only the x-coordinates (0 and 2)
-            new_value = (
-                value[0] - offset,
-                value[1],
-            )
-            # Drop None if length was originally 3
-            g[name] = tuple(x for x in new_value if x is not None)
 
-        if (
-            name.endswith("_BBOX")  # only touch REGION constants
-            and isinstance(value, tuple)
-            and len(value) >= 2
-        ):
-            # Adjust only the x-coordinates (0 and 2)
-            new_value = (
-                value[0] - offset,
-                value[1],
-                value[2] - offset,
-                value[3],
-            )
-            # Drop None if length was originally 3
-            g[name] = tuple(x for x in new_value if x is not None)
-
-    OFFSET_APPLIED = True
+CONST = ScenarioConstants()

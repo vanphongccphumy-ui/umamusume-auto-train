@@ -7,7 +7,7 @@ from core.state.state_analyzer import StateAnalyzer
 
 from utils.log import info
 from utils.assets_repository import get_icon
-import utils.constants as constants
+from utils.constants import CONST
 
 
 class TrainingManager:
@@ -46,7 +46,7 @@ class TrainingManager:
 
     def _execute_training(self, training_type):
         """Execute the selected training"""
-        x, y = constants.TRAINING_ICON_COORD[training_type]
+        x, y = CONST.TRAINING_ICON_COORD[training_type]
         if self.interaction.click_coordinates(x, y, clicks=3):
             return True
         # if self.interaction.click_element(get_icon(f"train_{training_type}"), clicks=3):

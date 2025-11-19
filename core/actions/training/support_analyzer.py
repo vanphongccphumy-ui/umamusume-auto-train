@@ -5,7 +5,7 @@ from core.actions.base import Interaction
 from core.state.state_analyzer import StateAnalyzer
 import core.config as config
 
-import utils.constants as constants
+from utils.constants import CONST
 from utils import assets_repository
 from utils.log import info, warning, error, debug
 from utils.helper import sleep, get_secs
@@ -56,7 +56,7 @@ class SupportAnalyzer:
             count_result["hints_per_friend_level"][friend_level] = 0
 
         hint_matches = self.interaction.recognizer.match_template(
-            constants.SUPPORT_CARD_ICON_BBOX,
+            CONST.SUPPORT_CARD_ICON_BBOX,
             assets_repository.get_icon("support_hint"),
             screen,
         )
@@ -70,7 +70,7 @@ class SupportAnalyzer:
                 count_result[key]["friendship_levels"][friend_level] = 0
 
             matches = self.interaction.recognizer.match_template(
-                constants.SUPPORT_CARD_ICON_BBOX, icon_path, screen
+                CONST.SUPPORT_CARD_ICON_BBOX, icon_path, screen
             )
             for match in matches:
                 # add the support as a specific key
@@ -83,12 +83,10 @@ class SupportAnalyzer:
                 match_horizontal_middle = floor((2 * x + w) / 2)
                 match_vertical_middle = floor((2 * y + h) / 2)
                 icon_to_friend_bar_distance = 63
-                bbox_left = (
-                    match_horizontal_middle + constants.SUPPORT_CARD_ICON_BBOX[0]
-                )
+                bbox_left = match_horizontal_middle + CONST.SUPPORT_CARD_ICON_BBOX[0]
                 bbox_top = (
                     match_vertical_middle
-                    + constants.SUPPORT_CARD_ICON_BBOX[1]
+                    + CONST.SUPPORT_CARD_ICON_BBOX[1]
                     + icon_to_friend_bar_distance
                 )
                 wanted_pixel = (bbox_left, bbox_top, 1, 1)  # xywh
@@ -120,7 +118,7 @@ class SupportAnalyzer:
         failcheck = "check_all"
         margin = 5
         x1, y1 = 50, 940
-        for key, coord in constants.TRAINING_ICON_COORD.items():
+        for key, coord in CONST.TRAINING_ICON_COORD.items():
 
             # pos = self.interaction.recognizer.locate_on_screen(
             #     icon_path, max_search_time=2

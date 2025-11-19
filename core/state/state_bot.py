@@ -1,6 +1,6 @@
 # core/state/state_bot.py
 from dataclasses import dataclass
-from typing import Dict, Union
+from typing import Dict, Union, Any
 
 import utils.constants as constants
 import core.config as config
@@ -16,6 +16,7 @@ class BotState:
     current_stats: Dict[str, int]
     criteria: str
     skill_pts: int
+    extra: Dict[str, Any] = None
 
     @property
     def missing_energy(self) -> float:

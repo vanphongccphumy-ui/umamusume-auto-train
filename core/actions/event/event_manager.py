@@ -5,7 +5,7 @@ import core.config as config
 from utils.helper import crop_screen, enhance_img, sleep
 from utils.assets_repository import get_icon
 from utils.log import debug
-import utils.constants as constants
+from utils.constants import CONST
 
 
 class EventManager:
@@ -93,7 +93,7 @@ class EventManager:
             return choice
 
     def _get_event_name(self, screen):
-        img = crop_screen(screen, constants.EVENT_NAME_REGION)
+        img = crop_screen(screen, CONST.EVENT_NAME_REGION)
         img = enhance_img(img, threshold=225)
         text = self.ocr.extract_text(img)
         debug(f"Event name: {text}")

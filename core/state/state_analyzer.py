@@ -1,9 +1,10 @@
-# core_emu/state/state_analyzer.py
+# core/state/state_analyzer.py
 import re
 from .state_bot import BotState
 from core.ocr import OCR
 from core.recognizer import Recognizer
-from utils import helper, constants, log
+from utils import helper, log
+from utils.constants import CONST, MOOD_LIST, BAD_STATUS_EFFECTS
 
 
 class StateAnalyzer:
@@ -30,7 +31,7 @@ class StateAnalyzer:
     def analyze_current_state(self, screen) -> BotState:
         energy_level, max_energy = self._check_energy_level(screen)
 
-        return BotState(
+        state = BotState(
             mood=self._check_mood(screen),
             turn=self._check_turn(screen),
             year=self._check_year(screen),
@@ -39,15 +40,21 @@ class StateAnalyzer:
             current_stats=self._check_stats(screen),
             criteria=self._check_criteria(screen),
             skill_pts=self._check_skill_pts(screen),
+            extra={},
         )
+
+        if hasattr(self, "extend_state"):
+            self.extend_state(screen, state)
+
+        return state
 
     def _check_stats(self, screen):
         stat_regions = {
-            "spd": constants.SPD_STAT_REGION,
-            "sta": constants.STA_STAT_REGION,
-            "pwr": constants.PWR_STAT_REGION,
-            "guts": constants.GUTS_STAT_REGION,
-            "wit": constants.WIT_STAT_REGION,
+            "spd": CONST.SPD_STAT_REGION,
+            "sta": CONST.STA_STAT_REGION,
+            "pwr": CONST.PWR_STAT_REGION,
+            "guts": CONST.GUTS_STAT_REGION,
+            "wit": CONST.WIT_STAT_REGION,
         }
 
         result = {}
@@ -58,14 +65,14 @@ class StateAnalyzer:
         return result
 
     def _check_mood(self, screen):
-        img = helper.crop_screen(screen, constants.MOOD_REGION)
+        img = helper.crop_screen(screen, CONST.MOOD_REGION)
         img = helper.enhance_img(img)
 
         mood_text = self.ocr.extract_text(img).upper().strip()
         log.debug(f"Raw mood text: '{mood_text}'")
 
         # 1. Exact match first
-        for known_mood in constants.MOOD_LIST:
+        for known_mood in MOOD_LIST:
             if known_mood.upper() in mood_text:
                 return known_mood
 
@@ -78,7 +85,7 @@ class StateAnalyzer:
         best_distance = float("inf")
         threshold = 3  # Maximum allowed distance
 
-        for known_mood in constants.MOOD_LIST:
+        for known_mood in MOOD_LIST:
             distance = self._levenshtein_distance(mood_text, known_mood.upper())
             if distance < best_distance:
                 best_distance = distance
@@ -97,7 +104,7 @@ class StateAnalyzer:
         return "UNKNOWN"
 
     def _check_turn(self, screen):
-        img = helper.crop_screen(screen, constants.TURN_REGION)
+        img = helper.crop_screen(screen, CONST.TURN_REGION)
         img = helper.enhance_img(img, threshold=200)
         turn_text = self.ocr.extract_text(img)
 
@@ -131,32 +138,32 @@ class StateAnalyzer:
         return -1
 
     def _check_year(self, screen):
-        img = helper.crop_screen(screen, constants.YEAR_REGION)
+        img = helper.crop_screen(screen, CONST.YEAR_REGION)
         img = helper.enhance_img(img)
         text = self.ocr.extract_text(img)
         return text
 
     def _check_criteria(self, screen):
-        img = helper.crop_screen(screen, constants.CRITERIA_REGION)
+        img = helper.crop_screen(screen, CONST.CRITERIA_REGION)
         img = helper.enhance_img(img)
         return self.ocr.extract_text(img)
 
     def _check_skill_pts(self, screen):
-        img = helper.crop_screen(screen, constants.SKILL_PTS_REGION)
+        img = helper.crop_screen(screen, CONST.SKILL_PTS_REGION)
         img = helper.enhance_img(img)
         return self.ocr.extract_number(img)
 
     def _check_energy_level(self, screen):
         right_bar_match = self.recognizer.match_template(
             template_path="assets/ui/energy_bar_right_end_part.png",
-            region=constants.ENERGY_BBOX,
+            region=CONST.ENERGY_BBOX,
             screen=screen,
         )
 
         if not right_bar_match:
             right_bar_match = self.recognizer.match_template(
                 template_path="assets/ui/energy_bar_right_end_part_2.png",
-                region=constants.ENERGY_BBOX,
+                region=CONST.ENERGY_BBOX,
                 screen=screen,
             )
 
@@ -164,7 +171,7 @@ class StateAnalyzer:
             x, y, w, h = right_bar_match[0]
             energy_bar_length = x
 
-            x, y, w, h = constants.ENERGY_BBOX
+            x, y, w, h = CONST.ENERGY_BBOX
             top_bottom_middle_pixel = round((y + h) / 2, 0)
 
             MAX_ENERGY_BBOX = (
@@ -233,13 +240,11 @@ class StateAnalyzer:
         normalized_text = status_effects_text.lower().replace(" ", "")
         matches = [
             k
-            for k in constants.BAD_STATUS_EFFECTS
+            for k in BAD_STATUS_EFFECTS
             if k.lower().replace(" ", "") in normalized_text
         ]
 
-        total_severity = sum(
-            constants.BAD_STATUS_EFFECTS[k]["Severity"] for k in matches
-        )
+        total_severity = sum(BAD_STATUS_EFFECTS[k]["Severity"] for k in matches)
         log.debug(f"Matches: {matches}, severity: {total_severity}")
         return matches, total_severity
 
@@ -262,3 +267,29 @@ class StateAnalyzer:
             previous_row = current_row
 
         return previous_row[-1]
+
+
+class URAStateAnalyzer(StateAnalyzer):
+    pass
+
+
+import cv2
+import time
+from datetime import datetime
+
+
+class UnityCupStateAnalyzer(StateAnalyzer):
+    def extend_state(self, screen, state: BotState):
+        state.extra["unity_turn"] = self._check_unity_turn(screen)
+
+    def _check_unity_turn(self, screen):
+        img = helper.crop_screen(screen, CONST.UNITY_TURN_REGION)
+        img = helper.enhance_img(img, threshold=230)
+        text = self.ocr.extract_number(img)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        cv2.imwrite(f"./logs/{timestamp}-{text}-unity_turn.png", img)
+
+        if text:
+            return text
+        return -1

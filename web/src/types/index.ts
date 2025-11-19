@@ -24,6 +24,7 @@ export const RaceScheduleSchema = z.object({
 
 export const ConfigSchema = z.object({
   config_name: z.string(),
+  scenario: z.string(),
   priority_stat: z.array(z.string()),
   priority_weights: z.array(z.number()),
   sleep_time_multiplier: z.number(),

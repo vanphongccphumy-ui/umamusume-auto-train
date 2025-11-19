@@ -1,5 +1,6 @@
 {
   "config_name": "Preset",
+  "scenario": "unity",
   "priority_stat": [
     "spd",
     "sta",

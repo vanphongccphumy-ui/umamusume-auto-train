@@ -3,11 +3,10 @@ from core.actions.base.interaction import Interaction
 from core.state.state_bot import BotState
 from core.state.state_analyzer import StateAnalyzer
 
-import utils.constants as constants
+from utils.constants import CONST
 from utils import assets_repository
 from utils.log import warning, info, debug, error
 from utils.helper import sleep
-import cv2
 
 
 class InfirmaryManager:
@@ -45,7 +44,7 @@ class InfirmaryManager:
 
         sleep(0.5)
         check_status_screen = self.interaction.input.take_screenshot(
-            constants.FULL_STATS_STATUS_REGION
+            CONST.FULL_STATS_STATUS_REGION
         )
         sleep(0.5)
 
