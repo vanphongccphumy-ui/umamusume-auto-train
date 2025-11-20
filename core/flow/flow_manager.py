@@ -45,9 +45,6 @@ class FlowManager:
             "race_manager": race_manager,
         }
 
-        debug(f"FlowManager deps keys: {list(self.deps.keys())}")
-        debug(f"State analyzer in deps: {self.deps['state_analyzer'] is not None}")
-
         self.flows = {"ura": URAFlow(**self.deps), "unity": UnityFlow(**self.deps)}
         self.active_flow = None
 

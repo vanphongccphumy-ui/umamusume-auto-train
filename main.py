@@ -5,9 +5,6 @@ import traceback
 
 from utils.helper import sleep
 from utils.log import info, error
-from utils.adb_helper import ADB
-
-import core.config as config
 
 from core.bot_manager import BotManager
 
@@ -15,21 +12,7 @@ from update_config import update_config
 from server.main import app
 
 hotkey = "f1"
-adb = ADB("127.0.0.1:5557")
-bot_manager = BotManager(adb)
-
-
-def main():
-    print("Uma Auto!")
-    try:
-        config.reload_config()
-
-        info(f"Config: {config.CONFIG_NAME}")
-        bot_manager.start()
-        threading.Thread(target=bot_manager.run, daemon=True).start()
-    except Exception as e:
-        error(f"Error in main thread: {e}")
-        traceback.print_exc()
+bot_manager = BotManager()
 
 
 def toggle_bot():
@@ -64,5 +47,5 @@ def start_server():
 if __name__ == "__main__":
     update_config()
     threading.Thread(target=hotkey_listener, daemon=True).start()
-    adb.connect()
+    bot_manager.connect_adb()
     start_server()

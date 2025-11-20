@@ -2,7 +2,6 @@
 import core.config as config
 from core.ocr import OCR
 from core.recognizer import Recognizer
-from core.state.state_analyzer import StateAnalyzer
 from utils.adb_helper import ADB
 from utils.log import debug, error, info, warning
 from utils.helper import sleep
@@ -12,7 +11,6 @@ import utils.constants as CONST
 from core.actions.base import Interaction, Input, Navigation
 from core.actions import (
     InfirmaryManager,
-    TrainingManager,
     SkillManager,
     RaceManager,
     EventManager,
@@ -37,7 +35,10 @@ class Bot:
         self.is_running = False
         self.adb = adb
         self.scenario = scenario or config.SCENARIO
-        debug(f"Bot created with scenario: {self.scenario}")
+
+        CONST.ACTIVE_SCENARIO = self.scenario
+        debug(f"Bot scenario: {self.scenario}")
+        debug(f"Global CONST: {CONST.ACTIVE_SCENARIO}")
 
         # Initialize components
         self.ocr = OCR()
@@ -55,12 +56,7 @@ class Bot:
         self.event_manager = EventManager(self.interaction, self.ocr)
         self.race_manager = RaceManager(self.interaction, self.navigation, self.ocr)
 
-        self.training = None
-        self.flow_manager = self._create_flow_manager()
-
-    def _create_flow_manager(self):
-        """Create flow manager with current dependencies"""
-        return FlowManager(
+        self.flow_manager = FlowManager(
             self.adb,
             self.ocr,
             self.recognizer,
@@ -74,40 +70,6 @@ class Bot:
             self.race_manager,
         )
 
-    def recreate_flow_manager(self):
-        """Recreate flow manager - public method for external call"""
-        self.flow_manager = self._create_flow_manager()
-        debug("Flow manager recreated")
-
-    def update_scenario(self, new_scenario: str):
-        """Update scenario and reinitialize components"""
-        if self.scenario == new_scenario:
-            return
-
-        info(f"Updating scenario from {self.scenario} to {new_scenario}")
-        self.scenario = new_scenario
-
-        # Update global CONST
-        import utils.constants as constants_module
-
-        constants_module.ACTIVE_SCENARIO = self.scenario
-
-        # Reinitialize state analyzer
-        self.state_analyzer = create_state_analyzer(
-            self.scenario, self.ocr, self.recognizer
-        )
-
-        # We have to update every instance that use state_analyzer
-        # Update infirmary manager
-        from core.actions import InfirmaryManager
-
-        self.infirmary_manager = InfirmaryManager(self.interaction, self.state_analyzer)
-
-        # Recreate flow manager
-        self.recreate_flow_manager()
-
-        debug(f"Scenario updated to: {self.scenario}")
-
     def start(self):
         self.is_running = True
         self.flow_manager.activate(config.SCENARIO)
@@ -118,7 +80,6 @@ class Bot:
         info("Bot stopped.")
 
     def run(self):
-        CONST.ACTIVE_SCENARIO = config.SCENARIO
         while self.is_running:
             sleep(0.5)
 

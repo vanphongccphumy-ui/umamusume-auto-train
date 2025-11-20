@@ -6,29 +6,31 @@ import threading
 
 
 class BotManager:
-    def __init__(self, adb: ADB):
-        self.adb = adb
+    def __init__(self):
+        self.adb = ADB("127.0.0.1:5557")
         self.bot = None
         self.bot_thread = None
         self.is_running = False
+        self._is_connected = False
+
+    def connect_adb(self):
+        """Connect to ADB"""
+        self.adb.connect()
+        self._is_connected = True
 
     def start(self):
-        """Start or restart the bot with current config"""
+        """Start bot - always create NEW instance"""
         if self.is_running:
             self.stop()
 
         config.reload_config()
 
-        self._update_global_constants()
+        if not self._is_connected:
+            self.connect_adb()
 
-        if self.bot is None:
-            # Create new bot instance
-            self.bot = Bot(self.adb, scenario=config.SCENARIO)
-            debug("New bot instance created")
-        else:
-            # Update existing bot with new scenario if changed
-            if self.bot.scenario != config.SCENARIO:
-                self.bot.update_scenario(config.SCENARIO)
+        # Create new instance
+        self.bot = Bot(self.adb, scenario=config.SCENARIO)
+        debug("New bot instance created")
 
         # Start the bot
         self.bot.start()
@@ -37,16 +39,15 @@ class BotManager:
         self.is_running = True
 
     def stop(self):
-        """Stop the bot"""
+        """Stop bot and DESTROY instance"""
         if self.bot and self.bot.is_running:
             self.bot.stop()
-            self.is_running = False
 
-    def restart(self):
-        """Restart the bot"""
-        info("Restarting bot...")
-        self.stop()
-        self.start()
+        # DESTROY BOT INSTANCE
+        self.bot = None
+        self.bot_thread = None
+        self.is_running = False
+        debug("Bot instance destroyed")
 
     def get_status(self):
         """Get current bot status"""
@@ -55,10 +56,3 @@ class BotManager:
             "scenario": self.bot.scenario if self.bot else None,
             "config_name": config.CONFIG_NAME,
         }
-
-    def _update_global_constants(self):
-        """Update global CONST based on current scenario"""
-        import utils.constants as constants
-
-        constants.ACTIVE_SCENARIO = config.SCENARIO
-        debug(f"Global CONST updated to scenario: {config.SCENARIO}")
